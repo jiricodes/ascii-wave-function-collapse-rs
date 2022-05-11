@@ -37,6 +37,11 @@ impl SymbolMap {
     // pub const STARTPIECES: &'static str = " /\\";
     const HILLPIECES: &'static str = "/\\_#";
 
+    pub const TOP_EDGE: &'static str = " _";
+    pub const RIGHT_EDGE: &'static str = " \\_#";
+    pub const BOTTOM_EDGE: &'static str = " /\\#";
+    pub const LEFT_EDGE: &'static str = " /_#";
+
     pub fn new() -> Self {
         let mut map = HashMap::new();
         let (c, n) = Self::empty();
@@ -79,7 +84,7 @@ impl SymbolMap {
         let value = '/';
         let mut neighbors = HashMap::with_capacity(Direction::COUNT);
         neighbors.insert(Direction::Top, " \\".to_string());
-        neighbors.insert(Direction::Left, " \\_".to_string());
+        neighbors.insert(Direction::Left, " _".to_string());
         neighbors.insert(Direction::Bottom, " \\_#".to_string());
         neighbors.insert(Direction::Right, "#\\".to_string());
         (value, neighbors)
@@ -91,7 +96,7 @@ impl SymbolMap {
         neighbors.insert(Direction::Top, " /".to_string());
         neighbors.insert(Direction::Left, "/#".to_string());
         neighbors.insert(Direction::Bottom, " /_#".to_string());
-        neighbors.insert(Direction::Right, " /_".to_string());
+        neighbors.insert(Direction::Right, " _".to_string());
         (value, neighbors)
     }
 

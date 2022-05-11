@@ -14,8 +14,21 @@ pub struct Grid {
 impl Grid {
     pub fn new(width: usize, height: usize) -> Self {
         let mut tiles = Vec::with_capacity(width * height);
-        for _ in 0..width * height {
-            tiles.push(Tile::default());
+        for l in 0..height {
+            for c in 0..width {
+                let mut tile = Tile::default();
+                if l == 0 {
+                    tile.prune(SymbolMap::TOP_EDGE);
+                } else if l == height - 1 {
+                    tile.prune(SymbolMap::BOTTOM_EDGE);
+                }
+                if c == 0 {
+                    tile.prune(SymbolMap::LEFT_EDGE);
+                } else if c == width - 1 {
+                    tile.prune(SymbolMap::RIGHT_EDGE);
+                }
+                tiles.push(tile);
+            }
         }
         Self {
             width,
@@ -36,13 +49,25 @@ impl Grid {
 
     pub fn collapse(&mut self, seed: u64, symmap: &SymbolMap) {
         let mut rng = ChaCha8Rng::seed_from_u64(seed);
+        self.min_opts_index = Some(rng.gen_range(0..self.width * self.height));
         while self.min_opts_index.is_some() {
-            let mut t = self.tiles.get_mut(self.min_opts_index.unwrap()).unwrap();
-            let i: usize = rng.gen_range(0..t.value.len() - 1);
+            let curri = self.min_opts_index.unwrap();
+            let mut t = self.tiles.get_mut(curri).unwrap();
+            // let copt = t.value.clone();
+            let i: usize = rng.gen_range(0..t.value.len());
             t.value = t.value.chars().nth(i).unwrap().to_string();
-            self.prune(self.min_opts_index.unwrap(), symmap);
-            println!("{}", self);
-            Grid::user_break();
+            // let cval = t.value.clone();
+            self.prune(curri, symmap);
+            // dbg!((&copt, &cval));
+            // if cval == "#".to_string() {
+            //     let nbs = self.neighbors(curri);
+            //     for (n, _) in nbs.iter() {
+            //         println!("{}: {}", n, self.tiles[*n].value);
+            //         Grid::user_break();
+            //     }
+            // }
+            // println!("{}", self);
+            // Grid::user_break();
         }
     }
 
@@ -68,7 +93,7 @@ impl Grid {
             }
         }
         self.find_min();
-        dbg!(&self.min_opts_index);
+        // dbg!(&self.min_opts_index);
     }
 
     fn find_min(&mut self) {
