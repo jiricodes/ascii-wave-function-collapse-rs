@@ -54,8 +54,9 @@ impl Grid {
             let curri = self.min_opts_index.unwrap();
             let mut t = self.tiles.get_mut(curri).unwrap();
             // let copt = t.value.clone();
-            let i: usize = rng.gen_range(0..t.value.len());
-            t.value = t.value.chars().nth(i).unwrap().to_string();
+            // let i: usize = rng.gen_range(0..t.value.len());
+            // t.value = t.value.chars().nth(i).unwrap().to_string();
+            t.value = symmap.rng_pick(&t.value, &mut rng);
             // let cval = t.value.clone();
             self.prune(curri, symmap);
             // dbg!((&copt, &cval));
@@ -112,6 +113,7 @@ impl Grid {
                     }
                 }
             } else if l == 0 {
+                println!("{}", self);
                 panic!("Tile {}, ran out of options", i);
             }
         }

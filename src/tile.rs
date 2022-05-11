@@ -1,8 +1,11 @@
 use itertools::Itertools;
+use rand::prelude::*;
+use rand_chacha::ChaCha8Rng;
+use serde::Serialize;
 use std::collections::HashMap;
 use std::fmt;
 
-#[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Direction {
     Top,
     Right,
@@ -28,8 +31,10 @@ impl Direction {
     }
 }
 
+#[derive(Debug, Serialize)]
 pub struct SymbolMap {
     map: HashMap<char, HashMap<Direction, String>>,
+    weights: HashMap<char, u64>,
 }
 
 impl SymbolMap {
@@ -54,7 +59,16 @@ impl SymbolMap {
         map.insert(c, n);
         let (c, n) = Self::hill_rock();
         map.insert(c, n);
-        Self { map }
+        Self {
+            map,
+            weights: HashMap::from_iter(vec![
+                (' ', 1000),
+                ('/', 10),
+                ('\\', 10),
+                ('_', 50),
+                ('#', 100),
+            ]),
+        }
     }
 
     fn get(&self, c: char, d: &Direction) -> Option<&str> {
@@ -64,6 +78,33 @@ impl SymbolMap {
             }
         }
         None
+    }
+
+    fn string_total_weight(&self, s: &String) -> u64 {
+        let mut total = 0;
+        for c in s.chars() {
+            total += self.weights.get(&c).unwrap();
+        }
+        total
+    }
+
+    fn pick_weighted_index(&self, s: &String, i: u64) -> char {
+        let mut i = i;
+        for ch in s.chars() {
+            let w = *self.weights.get(&ch).unwrap();
+            if i < w {
+                return ch;
+            }
+            i -= w;
+        }
+        panic!("weighted index out of range");
+        // return 'X';
+    }
+
+    pub fn rng_pick(&self, value: &String, rng: &mut ChaCha8Rng) -> String {
+        let total = self.string_total_weight(value);
+        let i: u64 = rng.gen_range(0..total);
+        self.pick_weighted_index(value, i).to_string()
     }
 
     pub fn get_dirs(&self, c: char) -> Option<&HashMap<Direction, String>> {
