@@ -53,22 +53,8 @@ impl Grid {
         while self.min_opts_index.is_some() {
             let curri = self.min_opts_index.unwrap();
             let mut t = self.tiles.get_mut(curri).unwrap();
-            // let copt = t.value.clone();
-            // let i: usize = rng.gen_range(0..t.value.len());
-            // t.value = t.value.chars().nth(i).unwrap().to_string();
             t.value = symmap.rng_pick(&t.value, &mut rng);
-            // let cval = t.value.clone();
             self.prune(curri, symmap);
-            // dbg!((&copt, &cval));
-            // if cval == "#".to_string() {
-            //     let nbs = self.neighbors(curri);
-            //     for (n, _) in nbs.iter() {
-            //         println!("{}: {}", n, self.tiles[*n].value);
-            //         Grid::user_break();
-            //     }
-            // }
-            // println!("{}", self);
-            // Grid::user_break();
         }
     }
 
@@ -94,7 +80,6 @@ impl Grid {
             }
         }
         self.find_min();
-        // dbg!(&self.min_opts_index);
     }
 
     fn find_min(&mut self) {
@@ -151,6 +136,6 @@ impl fmt::Display for Grid {
                 g += &format!("{}", self.tiles[i]);
             }
         }
-        write!(f, "{}", g)
+        write!(f, "Dimensions: {}x{}\n{}", self.width, self.height, g)
     }
 }
