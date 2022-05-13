@@ -1,11 +1,10 @@
 use itertools::Itertools;
 use rand::prelude::*;
 use rand_chacha::ChaCha8Rng;
-use serde::Serialize;
 use std::collections::HashMap;
 use std::fmt;
 
-#[derive(Serialize, Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Direction {
     Top,
     Right,
@@ -14,24 +13,10 @@ pub enum Direction {
 }
 
 impl Direction {
-    pub const ALL: [Direction; 4] = [
-        Direction::Top,
-        Direction::Right,
-        Direction::Bottom,
-        Direction::Left,
-    ];
     pub const COUNT: usize = 4;
-    pub fn opposite(self) -> Self {
-        match self {
-            Self::Top => Self::Bottom,
-            Self::Left => Self::Right,
-            Self::Bottom => Self::Top,
-            Self::Right => Self::Left,
-        }
-    }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug)]
 pub struct SymbolMap {
     map: HashMap<char, HashMap<Direction, String>>,
     weights: HashMap<char, u64>,
@@ -80,7 +65,7 @@ impl SymbolMap {
         None
     }
 
-    fn string_total_weight(&self, s: &String) -> u64 {
+    fn string_total_weight(&self, s: &str) -> u64 {
         let mut total = 0;
         for c in s.chars() {
             total += self.weights.get(&c).unwrap();
@@ -88,7 +73,7 @@ impl SymbolMap {
         total
     }
 
-    fn pick_weighted_index(&self, s: &String, i: u64) -> char {
+    fn pick_weighted_index(&self, s: &str, i: u64) -> char {
         let mut i = i;
         for ch in s.chars() {
             let w = *self.weights.get(&ch).unwrap();
@@ -101,14 +86,10 @@ impl SymbolMap {
         // return 'X';
     }
 
-    pub fn rng_pick(&self, value: &String, rng: &mut ChaCha8Rng) -> String {
+    pub fn rng_pick(&self, value: &str, rng: &mut ChaCha8Rng) -> String {
         let total = self.string_total_weight(value);
         let i: u64 = rng.gen_range(0..total);
         self.pick_weighted_index(value, i).to_string()
-    }
-
-    pub fn get_dirs(&self, c: char) -> Option<&HashMap<Direction, String>> {
-        self.map.get(&c)
     }
 
     fn empty() -> (char, HashMap<Direction, String>) {
@@ -186,6 +167,7 @@ impl fmt::Display for Tile {
 }
 
 impl Tile {
+    #[cfg(test)]
     pub fn new(value: String) -> Self {
         Self { value }
     }
@@ -198,7 +180,7 @@ impl Tile {
             .collect();
         self.value = combo;
         assert!(
-            self.value.len() != 0,
+            !self.value.is_empty(),
             "Tile cannot have less than 1 char after pruning"
         );
     }
@@ -220,22 +202,14 @@ impl Tile {
     ) -> bool {
         let mut combo = String::new();
         for c in other.value.chars() {
-            let opts = symmap.get(c, dir);
-            if opts.is_some() {
-                combo += self.pruned_opts(opts.unwrap()).as_str();
+            if let Some(opts) = symmap.get(c, dir) {
+                combo += self.pruned_opts(opts).as_str();
             }
         }
         combo = combo.chars().unique().collect();
         let ret = self.value.len() != combo.len();
         self.value = combo;
         ret
-    }
-
-    pub fn get_value(&self) -> Option<char> {
-        if self.value.len() == 1 {
-            return self.value.chars().next();
-        }
-        None
     }
 
     pub fn is_set(&self) -> bool {

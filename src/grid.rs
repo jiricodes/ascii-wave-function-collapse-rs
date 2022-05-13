@@ -38,15 +38,6 @@ impl Grid {
         }
     }
 
-    fn user_break() {
-        use std::io::{stdin, stdout, Write};
-        let mut s = String::new();
-        let _ = stdout().flush();
-        stdin()
-            .read_line(&mut s)
-            .expect("Did not enter a correct string");
-    }
-
     pub fn collapse(&mut self, seed: u64, symmap: &SymbolMap) {
         let mut rng = ChaCha8Rng::seed_from_u64(seed);
         self.min_opts_index = Some(rng.gen_range(0..self.width * self.height));
@@ -70,11 +61,11 @@ impl Grid {
             for (n_idx, dir) in all_n.iter() {
                 let n = self.tiles.get_mut(*n_idx).unwrap();
                 // if neighbor has solution, then ignore it
-                if n.is_set() || visited.contains(&n_idx) {
+                if n.is_set() || visited.contains(n_idx) {
                     continue;
                 }
                 // else prune its options and append it to the queue
-                if n.prune_with_other_in_dir(&current_tile_clone, &dir, symmap) {
+                if n.prune_with_other_in_dir(&current_tile_clone, dir, symmap) {
                     q.push_back(*n_idx);
                 }
             }

@@ -2,7 +2,7 @@
 In ascii... with spaghetti... cooked very slow...
 
 ## Features
-Not many. Currently generates hilly map with defined size and given seed. The map modularity is not really implemented, but weight can be adjusted in-code to specify "biomes".
+Not many. Currently generates hilly map with defined size and given seed. The map modularity is not really implemented, but weight can be adjusted in-code to specify "biomes". There is no backtracking if the algo gets stuck in an impossible situation (doesn't happen so often though).
 
 ## Usage
 Requires rust to be installed. Then use `cargo run --release` to run or `cargo build --release` to build.

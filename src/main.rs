@@ -4,10 +4,8 @@ mod tile;
 use grid::Grid;
 use tile::SymbolMap;
 
-use rand::prelude::*;
-
 use clap::Parser;
-use ron::ser::{to_string_pretty, PrettyConfig};
+use rand::prelude::*;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -28,13 +26,6 @@ struct Args {
 fn main() {
     let args = Args::parse();
     let symmap = SymbolMap::new();
-
-    // let pretty = PrettyConfig::new()
-    //     .depth_limit(3)
-    //     .separate_tuple_members(true)
-    //     .enumerate_arrays(true);
-    // let s = to_string_pretty(&symmap, pretty).expect("Serialization failed");
-    // println!("{}", s);
 
     let mut grid = Grid::new(args.width, args.height);
 
