@@ -1,6 +1,10 @@
 # Wave Function Collapse
 In ascii... with spaghetti... cooked very slow...
 
+<p float="center">
+  <img src="resources/preview.png" width="720" />
+</p>
+
 ## Features
 Not many. Currently generates hilly map with defined size and given seed. The map modularity is not really implemented, but weight can be adjusted in-code to specify "biomes". There is no backtracking if the algo gets stuck in an impossible situation (doesn't happen so often though).
 
